@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  auriza-backend:
+    build: .
+    container_name: auriza-backend
+    ports:
+      - \"8000:8000\"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///./auriza.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - .:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Optional: PostgreSQL
+  postgres:
+    image: postgres:15
+    container_name: auriza-postgres
+    environment:
+      POSTGRES_USER: auriza
+      POSTGRES_PASSWORD: auriza_secure_password
+      POSTGRES_DB: auriza_db
+    ports:
+      - \"5432:5432\"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Optional: MongoDB
+  mongodb:
+    image: mongo:7
+    container_name: auriza-mongodb
+    ports:
+      - \"27017:27017\"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: auriza
+
+  # Optional: Redis
+  redis:
+    image: redis:7-alpine
+    container_name: auriza-redis
+    ports:
+      - \"6379:6379\"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
